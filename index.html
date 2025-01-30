@@ -1,1 +1,155 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор случайного слова</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            transition: background 0.3s, color 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .dark-theme {
+            background: #121212;
+            color: white;
+        }
+        .light-theme {
+            background: #ffffff;
+            color: black;
+        }
+        .theme-button {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 20px;
+            height: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+        }
+        .word-box {
+            font-size: 32px;
+            font-weight: bold;
+            border: 2px solid;
+            display: inline-block;
+            padding: 20px;
+            min-width: 220px;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="light-theme" onload="openFullscreen()">
+    <button class="theme-button" ondblclick="toggleTheme()"></button>
+    <div class="word-box" id="wordBox">Нажми кнопку</div>
+    <button class="button" onclick="generateWord()">Сгенерировать</button>
+    <div class="footer" onclick="toggleFooter()">©randomiser</div>
+    <div id="footerText" class="hidden">Хочешь больше трюков: Telegram: @annemannstore</div>
 
+    <script>
+        let lastPressTime = 0;
+        let specialWords = ["Туман", "Печать", "Мечта", "Звёзды"];
+        let specialIndex = 0;
+        let theme = "light";
+        let themeClicks = 0;
+
+        const wordList = [
+            "Телефон", "Портсигар", "Цветы", "Набор для маникюра", "Елочная игрушка", "Неоновая вывеска",
+            "Шоколад", "Набор сладостей", "Кухонный сервиз", "Мишура", "Алкоголь", "Сигары", "Трубка",
+            "Снежный шар", "Деньги", "Коньяк", "Книга", "Пазлы", "Орехи", "Кружка", "Бижутерия", "Ювелирка",
+            "Смарт-часы", "Хобби-набор", "Деньги", "Гирлянда", "Фейерверк", "Подсвечник", "Свитер", "Духи",
+            "Свечка", "Мультиварка", "Красивый ежедневник", "Губная гармошка", "Лего-набор", "Диско-шар",
+            "Радиоуправляемый вертолет", "Наушники", "Чайник", "Утюг", "Шторы", "Бокалы", "Ночник",
+            "Варежки", "Шапка", "Киндер-сюрприз", "Шпажки", "Чехол для смартфона", "Дизайнерское мыло",
+            "Салфетки для стола", "Набор ножей", "Шкатулка", "Музыкальная шкатулка", "Сюрприз бокс",
+            "Кубик Рубика", "Огарок", "Люксембург", "Бант", "Фарш", "Люстра", "Букварь", "Боцман",
+            "Автовагон", "Ведомость", "Лифт", "Газель", "Автоинспектор", "Ватикан", "Корова", "Варенье",
+            "Клюв", "Колышек", "Салат", "Софа", "Луковка", "Погремушка", "Светильник", "Макет", "Горох",
+            "Автодром", "Тара", "Сапог", "Белье", "Книга", "Лабиринт", "Перекладина", "Ремонт",
+            "Вертолёт", "Чипсы", "Лес", "Карты", "Кресло", "Вентилятор", "Стол", "Окно", "Ноут", "Стилус",
+            "Вопрос", "Стена", "Инструкция", "Ландыш", "Дорога", "Парковка", "Магазин", "Лаванда",
+            "Кашица", "Карлик", "Пастор", "Тележка", "Жандармерия", "Баба", "Хвоя", "Родинка", "Сом",
+            "Пшено", "Куница", "Звездочка", "Марокко", "Миндаль", "Метла", "Тесто", "Поезд", "Дворец"
+        ];
+
+        function toggleTheme() {
+            themeClicks++;
+            if (themeClicks === 2) {
+                theme = theme === "light" ? "dark" : "light";
+                document.body.className = theme + "-theme";
+                themeClicks = 0;
+            }
+        }
+
+        function generateWord() {
+            let currentTime = new Date().getTime();
+            let timeSinceLastPress = (currentTime - lastPressTime) / 1000;
+
+            if (timeSinceLastPress >= 7 && specialIndex < specialWords.length) {
+                animateWord(specialWords[specialIndex]);
+                specialIndex++;
+            } else {
+                animateWord(getRandomWord());
+            }
+
+            lastPressTime = currentTime;
+        }
+
+        function getRandomWord() {
+            return wordList[Math.floor(Math.random() * wordList.length)];
+        }
+
+        function animateWord(finalWord) {
+            let wordBox = document.getElementById("wordBox");
+            let interval = setInterval(() => {
+                wordBox.textContent = getRandomWord();
+            }, 50);
+
+            setTimeout(() => {
+                clearInterval(interval);
+                wordBox.textContent = finalWord;
+            }, 3000);
+        }
+
+        function toggleFooter() {
+            let footerText = document.getElementById("footerText");
+            footerText.classList.toggle("hidden");
+        }
+
+        function openFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            }
+        }
+    </script>
+</body>
+</html>
